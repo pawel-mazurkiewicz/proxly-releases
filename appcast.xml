@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Proxly Updates</title>
+    <link>https://github.com/pawel-mazurkiewicz/proxly-releases</link>
+    <description>Updates for Proxly - Smart Browser Chooser</description>
+    <language>en</language>
+    <item>
+      <title>Version 1.2.2</title>
+      <description><![CDATA[<ul>
+<li>**Sandbox Removal**: Removed app sandbox restrictions to enable full profile support and browser launching capabilities</li>
+<li>**Browser Profile Support**: Launch specific browser profiles (Chrome, Edge, Firefox, Brave)</li>
+<li>**Advanced Browser Targeting**: Configure custom arguments and profile-specific routing</li>
+<li>**Profile Detection System**: Automatic detection of installed browser profiles</li>
+<li>**Profile Permission Management**: Handle macOS privacy permissions for profile access</li>
+<li>**License Management**: Gumroad-based licensing system for non-App Store builds</li>
+<li>**Enhanced URL Processing**: Improved pattern matching with URL path support</li>
+<li>**Handoff/Continuity Support**: Seamless URL transfer from iOS devices</li>
+<li>**Automatic Updates**: Integrated Sparkle framework for app updates</li>
+<li>**Profile Selection UI**: Interactive browser and profile selection interface</li>
+<li>**Custom Arguments Support**: Advanced browser configuration with command-line arguments</li>
+<li>**Pattern Matching**: Extended domain patterns to support URL paths and subdomains</li>
+<li>**Rule System**: Migrated from simple browser identifiers to comprehensive BrowserTarget system</li>
+<li>**UI Components**: New profile-aware selection panels and configuration views</li>
+<li>**Onboarding Flow**: Added license validation step for non-App Store builds</li>
+<li>**Settings Management**: Profile features toggle and advanced configuration options</li>
+<li>**Localization**: Updated all language files with new profile-related strings</li>
+<li>**Keychain Integration**: Secure storage for license keys and sensitive data</li>
+<li>**Permission Handling**: Proper macOS privacy permission requests for profile access</li>
+<li>**Hardened Runtime**: Enhanced security for notarized builds</li>
+<li>**Entitlements Simplified**: Removed sandbox restrictions for enhanced functionality while maintaining security through code signing and notarization</li>
+<li>**Architecture Refactoring**: New BrowserTarget and BrowserProfile model system</li>
+<li>**Profile Handlers**: Specialized handlers for Chrome, Edge, Firefox, and Brave profiles</li>
+<li>**Launch Methods**: Multiple browser launching strategies with graceful degradation</li>
+<li>**Error Handling**: Comprehensive error management for profile operations</li>
+<li>**Migration Support**: Backward compatibility for existing rule configurations</li>
+<li>**Build System**: Updated to build 24 with enhanced project configuration</li>
+<li>**Menu Bar Integration**: Improved status bar behavior and license-aware functionality  </li>
+<li>**App Lifecycle**: Better handling of onboarding completion and license validation</li>
+<li>**URL Processing**: Enhanced Handoff URL handling and processing flow</li>
+<li>**Entitlements**: Simplified entitlements for better compatibility</li>
+<li>**Logger**: Improved logging system with OSLog integration</li>
+</ul>]]></description>
+      <pubDate>Tue, 26 Aug 2025 21:33:17 +0000</pubDate>
+      <sparkle:version>68</sparkle:version>
+      <sparkle:shortVersionString>1.2.2</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <enclosure 
+        url="https://github.com/pawel-mazurkiewicz/proxly-releases/releases/download/v1.2.2/Proxly.dmg"
+        length="5883134"
+        type="application/x-apple-diskimage"
+        sparkle:edSignature="Fupc6FB+i1lOEWSMjJeW1NF9xHZ6PhJChfgVzhirc7fuKHzHJmA2EikpDAX4zo1c0/D+YBaDdF1JVEAZTLooDg==" />
+    </item>
+  </channel>
+</rss>
