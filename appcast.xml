@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Proxly Updates</title>
+    <link>https://github.com/pawel-mazurkiewicz/proxly-releases</link>
+    <description>Updates for Proxly - Smart Browser Chooser</description>
+    <language>en</language>
+    <item>
+      <title>Version 1.2.3</title>
+      <description><![CDATA[<ul>
+<li>**Memory Leak Resolution**: Eliminated memory leaks in URL processing through hybrid architecture refactoring</li>
+<li>**Regex Caching**: Implemented thread-safe regex pattern caching to prevent repeated compilation</li>
+<li>**State Management**: Extracted stateless processing logic to prevent memory accumulation on high-volume URL processing</li>
+<li>**Thread Safety**: Fixed concurrent access crash in regex cache with proper barrier synchronization</li>
+<li>**Sparkle Gentle Reminders**: Implemented proper gentle reminder support to eliminate background update warnings</li>
+<li>**File Logging**: Enhanced Logger with file-based logging to daily .log files for better debugging</li>
+<li>**Update Notifications**: Added rich user notifications for background updates with "Install Now" and "Later" action buttons</li>
+<li>**Notification Handling**: Improved user experience with proper notification permission requests and response handling</li>
+</ul>]]></description>
+      <pubDate>Thu, 28 Aug 2025 17:58:27 +0000</pubDate>
+      <sparkle:version>75</sparkle:version>
+      <sparkle:shortVersionString>1.2.3</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <enclosure 
+        url="https://github.com/pawel-mazurkiewicz/proxly-releases/releases/download/v1.2.3/Proxly.dmg"
+        length="5879276"
+        type="application/x-apple-diskimage"
+        sparkle:edSignature="6ocMn5mUWlGtIr2SwHAWGxCj4v0YrBAAoxPvFqi8cVJvJkeg9AKmxxQbraLolfnm8M7/Q7/Vkwj0XHogbdsVBA==" />
+    </item>
+  </channel>
+</rss>
