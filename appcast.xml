@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Proxly Updates</title>
+    <link>https://github.com/pawel-mazurkiewicz/proxly-releases</link>
+    <description>Updates for Proxly - Smart Browser Chooser</description>
+    <language>en</language>
+    <item>
+      <title>Version 1.3.0</title>
+      <description><![CDATA[<ul>
+<li>**iCloud Sync (Beta)**: Synchronize rules and settings across all your devices using iCloud</li>
+<li>**Rule Import & Export**: Backup and share your routing rules</li>
+<li>**Browser Visibility Management**: Control which browsers appear in selection menus</li>
+<li>**Delete All Rules**: Quick way to remove all routing rules at once</li>
+<li>**Settings Interface**: Redesigned settings with improved organization and visual design</li>
+<li>**Onboarding Experience**: Enhanced first-time experience with setting up the iCloud sync</li>
+<li>**Notification System**: Unified notification service for better user awareness</li>
+<li>**Notifications**: The notifications will correctly "pop up" now, as expected</li>
+</ul>]]></description>
+      <pubDate>Tue, 09 Sep 2025 12:35:32 +0000</pubDate>
+      <sparkle:version>59</sparkle:version>
+      <sparkle:shortVersionString>1.3.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <enclosure 
+        url="https://github.com/pawel-mazurkiewicz/proxly-releases/releases/download/v1.3.0/Proxly.dmg"
+        length="5883906"
+        type="application/x-apple-diskimage"
+        sparkle:edSignature="pu/Urv9vu8McKSq3vuSdCcyA6RcK3DrjmJZaDWKQHYH2o8K69Y+S9HeM8YDSqcwUG8SzT1YeUk8YuE+V1hfjAQ==" />
+    </item>
+  </channel>
+</rss>
