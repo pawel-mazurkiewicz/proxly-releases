@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proxly License Admin</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.4;
+      --bg: #f5f5f7;
+      --fg: #1f1f24;
+      --header-bg: linear-gradient(120deg, #3b82f6, #2563eb);
+      --header-fg: #fff;
+      --main-bg: #d6d6dc;
+      --aside-bg: #fff;
+      --border-color: #e5e7eb;
+      --button-bg: #2563eb;
+      --button-fg: #fff;
+      --button-danger-bg: #dc2626;
+      --mode-switch-bg: #e5e7eb;
+      --mode-switch-fg: #111827;
+      --mode-switch-active-bg: #2563eb;
+      --mode-switch-active-fg: #fff;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #18181b;
+        --fg: #f5f5f7;
+        --header-bg: linear-gradient(120deg, #1e293b, #2563eb);
+        --header-fg: #f5f5f7;
+        --main-bg: #23232a;
+        --aside-bg: #1f1f24;
+        --border-color: #3b3b46;
+        --button-bg: #2563eb;
+        --button-fg: #f5f5f7;
+        --button-danger-bg: #dc2626;
+        --mode-switch-bg: #23232a;
+        --mode-switch-fg: #f5f5f7;
+        --mode-switch-active-bg: #2563eb;
+        --mode-switch-active-fg: #f5f5f7;
+      }
+    }
+    html, body {
+      background: var(--bg);
+      color: var(--fg);
+    }
+    body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.25rem; background: var(--header-bg); color: var(--header-fg); }
+    header h1 { margin: 0; font-size: 1.3rem; }
+    header button { font-size: 1.1rem; border: none; background: rgba(255,255,255,0.2); color: var(--header-fg); padding: 0.2rem 0.5rem; border-radius: 6px; cursor: pointer; }
+    main { flex: 1; display: grid; grid-template-columns: 320px 1fr; gap: 1px; background: var(--main-bg); }
+    aside { background: var(--aside-bg); display: flex; flex-direction: column; padding: 1rem; }
+    .list-header { display: flex; justify-content: space-between; align-items: center; }
+    .list-header h2 { margin: 0; }
+    .toolbar { margin: 0.75rem 0; display: flex; gap: 0.5rem; }
+    .mode-switch { display: flex; gap: 0.5rem; margin: 0.75rem 0; }
+    .mode-switch button { flex: 1; background: var(--mode-switch-bg); color: var(--mode-switch-fg); border-radius: 999px; }
+    .mode-switch button.active { background: var(--mode-switch-active-bg); color: var(--mode-switch-active-fg); }
+    button { border: none; border-radius: 6px; padding: 0.4rem 0.75rem; font-size: 0.9rem; cursor: pointer; background: var(--button-bg); color: var(--button-fg); transition: transform 0.1s ease; }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    button.danger { background: var(--button-danger-bg); }
+    #list-container { flex: 1; overflow: auto; border: 1px solid var(--border-color); border-radius: 8px; }
+    .list-item { padding: 0.75rem; border-bottom: 1px solid #e5e7eb; cursor: pointer; }
+    .list-item:last-child { border-bottom: none; }
+    .list-item.active { background: rgba(37, 99, 235, 0.12); }
+    .list-item h4 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+    .list-item .meta { font-size: 0.8rem; color: #6b7280; display: flex; justify-content: space-between; }
+    .pager { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-top: 0.75rem; }
+    #details { background: var(--main-bg); padding: 1.25rem 1.5rem; overflow-y: auto; }
+    .hidden { display: none !important; }
+    .empty { height: 100%; display: grid; place-content: center; color: #6b7280; }
+    .details-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .details-header .actions { display: flex; gap: 0.5rem; align-items: center; }
+    .details-header h2 { margin: 0; }
+    .details-header p { margin: 0; color: var(--fg); }
+    .status-pill { padding: 0.4rem 0.75rem; border-radius: 999px; font-weight: 600; background: var(--mode-switch-bg); color: var(--mode-switch-fg); text-transform: uppercase; font-size: 0.75rem; }
+    .status-pill[data-status="active"] { background: rgba(20, 239, 100, 0.8); color: #ffffff; }
+    .status-pill[data-status="revoked"] { background: rgba(239,68,68,0.8); color: #ffffff; }
+    .status-pill[data-status="suspended"], .status-pill[data-status="expired"] { background: rgba(250,204,21,0.8); color: #ffffff; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin: 1.25rem 0; }
+    .grid div { background: var(--aside-bg); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); }
+    .label { display: block; font-size: 0.8rem; text-transform: uppercase; color: #6b7280; margin-bottom: 0.35rem; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .section-header h3 { margin: 0; }
+    .code-block { background: var(--main-bg); color: var(--fg); padding: 0.75rem; border-radius: 8px; white-space: pre-wrap; word-break: break-word; }
+    #activations-table { width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden; border: 1px solid #e5e7eb; }
+    #activations-table th, #activations-table td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 0.85rem; }
+    #activations-table tbody tr:nth-child(even) { background: #f9fafb; }
+    #config-panel { background: #111827f0; color: white; padding: 1rem 1.25rem; position: fixed; top: 64px; right: 16px; width: min(360px, 90vw); border-radius: 12px; box-shadow: 0 18px 40px -18px rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); z-index: 1000; }
+    #config-panel h2 { margin-top: 0; }
+    form label { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.75rem; font-size: 0.85rem; }
+    input, textarea, select { border: 1px solid #cbd5f5; border-radius: 6px; padding: 0.5rem; font-size: 0.95rem; font-family: inherit; }
+    textarea { resize: vertical; }
+    .form-actions, menu { display: flex; justify-content: flex-end; gap: 0.5rem; }
+    dialog { border: none; border-radius: 12px; padding: 1.25rem 1.5rem; box-shadow: 0 10px 30px -12px rgba(15, 23, 42, 0.5); }
+    dialog::backdrop { background: rgba(15, 23, 42, 0.45); }
+    .toast { position: fixed; bottom: 18px; right: 18px; padding: 0.75rem 1rem; border-radius: 8px; background: rgba(15, 23, 42, 0.9); color: white; min-width: 200px; text-align: center; transition: opacity 0.2s ease, transform 0.2s ease; }
+    .toast.hidden { opacity: 0; transform: translateY(16px); pointer-events: none; }
+    .toast.success { background: rgba(22, 163, 74, 0.93); }
+    .toast.error { background: rgba(220, 38, 38, 0.92); }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } aside { order: 2; } #details { order: 1; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Proxly License Admin</h1>
+    <button id="toggle-config" title="Edit connection settings">⚙️</button>
+  </header>
+
+  <section id="config-panel" class="hidden">
+    <h2>Connection</h2>
+    <form id="config-form">
+      <label>
+        API Base URL
+        <input type="url" id="api-base" placeholder="http://localhost:3939/v1" required />
+      </label>
+      <label>
+        Admin JWT Token
+        <textarea id="api-token" rows="3" placeholder="eyJhbGciOi..." required></textarea>
+      </label>
+      <div class="form-actions">
+        <button type="submit">Save</button>
+        <button type="button" id="config-cancel">Cancel</button>
+      </div>
+    </form>
+  </section>
+
+  <main>
+    <aside>
+      <div class="list-header">
+        <h2 id="list-title">Licenses</h2>
+        <button id="refresh-button" title="Reload">⟳</button>
+      </div>
+      <div class="mode-switch">
+        <button id="mode-licenses" class="active">Licenses</button>
+        <button id="mode-trials">Trials</button>
+      </div>
+      <div class="toolbar" id="license-toolbar">
+        <button id="create-license">➕ New License</button>
+      </div>
+      <div id="list-container" class="list"></div>
+      <div class="pager">
+        <button id="prev-page">Prev</button>
+        <span id="page-info"></span>
+        <button id="next-page">Next</button>
+      </div>
+    </aside>
+
+    <section id="details">
+      <div id="empty-state" class="empty">
+        <p>Select a license to view details</p>
+      </div>
+      <div id="license-details" class="hidden">
+        <header class="details-header">
+          <div>
+            <h2 id="license-key"></h2>
+            <p id="license-id"></p>
+          </div>
+          <div class="actions">
+            <button id="edit-license">Edit</button>
+            <button id="delete-license" class="danger">Delete</button>
+          </div>
+          <div class="status-pill" id="license-status"></div>
+        </header>
+        <section class="grid">
+          <div>
+            <span class="label">Max Activations</span>
+            <span id="license-max"></span>
+          </div>
+          <div>
+            <span class="label">Activation Count</span>
+            <span id="license-count"></span>
+          </div>
+          <div>
+            <span class="label">Remaining</span>
+            <span id="license-remaining"></span>
+          </div>
+          <div>
+            <span class="label">Last Updated</span>
+            <span id="license-updated"></span>
+          </div>
+        </section>
+        <section>
+          <div class="section-header">
+            <h3>Metadata</h3>
+          </div>
+          <pre id="license-metadata" class="code-block">None</pre>
+        </section>
+        <section>
+          <div class="section-header">
+            <h3>Activations</h3>
+            <div>
+              <button id="refresh-activations">Reload</button>
+              <button id="reset-activations" class="danger">Reset</button>
+            </div>
+          </div>
+          <table id="activations-table">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Client ID</th>
+                <th>Device</th>
+                <th>IP</th>
+                <th>User Agent</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+      </div>
+      <div id="trial-details" class="hidden">
+        <header class="details-header">
+          <div>
+            <h2 id="trial-fingerprint"></h2>
+            <p id="trial-client"></p>
+          </div>
+          <div class="actions">
+            <button id="trial-edit">Edit</button>
+            <button id="trial-delete" class="danger">Delete</button>
+            <button id="trial-convert">Mark Converted</button>
+            <button id="trial-cancel" class="danger">Cancel Trial</button>
+          </div>
+          <div class="status-pill" id="trial-status"></div>
+        </header>
+        <section class="grid">
+          <div>
+            <span class="label">Started</span>
+            <span id="trial-started"></span>
+          </div>
+          <div>
+            <span class="label">Expires</span>
+            <span id="trial-expires"></span>
+          </div>
+          <div>
+            <span class="label">Days Remaining</span>
+            <span id="trial-remaining"></span>
+          </div>
+          <div>
+            <span class="label">Status</span>
+            <span id="trial-status-text"></span>
+          </div>
+        </section>
+        <section>
+          <div class="section-header">
+            <h3>Metadata</h3>
+          </div>
+          <pre id="trial-metadata" class="code-block">None</pre>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="license-dialog">
+    <form method="dialog" id="license-form">
+      <h2 id="dialog-title">New License</h2>
+      <label id="license-key-field">
+        License Key
+        <input type="text" id="form-key" placeholder="LICENSE-KEY-123" required />
+      </label>
+      <label>
+        Max Activations
+        <input type="number" id="form-max" min="1" value="5" required />
+      </label>
+      <label>
+        Status
+        <select id="form-status">
+          <option value="active">Active</option>
+          <option value="revoked">Revoked</option>
+          <option value="suspended">Suspended</option>
+          <option value="expired">Expired</option>
+        </select>
+      </label>
+      <label>
+        Metadata (JSON)
+        <textarea id="form-metadata" rows="3" placeholder='{"plan":"pro"}'></textarea>
+      </label>
+      <menu>
+        <button type="button" id="dialog-cancel">Cancel</button>
+        <button type="submit" id="dialog-submit">Save</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <dialog id="trial-dialog">
+    <form method="dialog" id="trial-form">
+      <h2 id="trial-dialog-title">Edit Trial</h2>
+      <label>
+        Client ID
+        <input type="text" id="trial-form-client" placeholder="client-123" />
+      </label>
+      <label>
+        Status
+        <select id="trial-form-status">
+          <option value="active">Active</option>
+          <option value="converted">Converted</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="not_started">Not Started</option>
+          <option value="expired">Expired</option>
+        </select>
+      </label>
+      <label>
+        Expires At
+        <input type="datetime-local" id="trial-form-expires" required />
+      </label>
+      <label>
+        Metadata (JSON)
+        <textarea id="trial-form-metadata" rows="3" placeholder='{"utm":"campaign"}'></textarea>
+      </label>
+      <menu>
+        <button type="button" id="trial-dialog-cancel">Cancel</button>
+        <button type="submit" id="trial-dialog-submit">Save</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog">
+    <form method="dialog">
+      <p id="confirm-message"></p>
+      <menu>
+        <button value="cancel">Cancel</button>
+        <button value="confirm" class="danger">Confirm</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script>
+    const STORAGE_KEY = 'proxly-license-admin-config';
+    const PAGE_SIZE = 20;
+
+    const elements = {
+      toggleConfig: document.getElementById('toggle-config'),
+      configPanel: document.getElementById('config-panel'),
+      configForm: document.getElementById('config-form'),
+      configCancel: document.getElementById('config-cancel'),
+      apiBase: document.getElementById('api-base'),
+      apiToken: document.getElementById('api-token'),
+      listTitle: document.getElementById('list-title'),
+      refreshButton: document.getElementById('refresh-button'),
+      modeLicenses: document.getElementById('mode-licenses'),
+      modeTrials: document.getElementById('mode-trials'),
+      listContainer: document.getElementById('list-container'),
+      licenseToolbar: document.getElementById('license-toolbar'),
+      createLicense: document.getElementById('create-license'),
+      prevPage: document.getElementById('prev-page'),
+      nextPage: document.getElementById('next-page'),
+      pageInfo: document.getElementById('page-info'),
+      emptyState: document.getElementById('empty-state'),
+      emptyStateMessage: document.querySelector('#empty-state p'),
+      licenseDetails: document.getElementById('license-details'),
+      trialDetails: document.getElementById('trial-details'),
+      licenseKey: document.getElementById('license-key'),
+      licenseId: document.getElementById('license-id'),
+      licenseStatus: document.getElementById('license-status'),
+      licenseMax: document.getElementById('license-max'),
+      licenseCount: document.getElementById('license-count'),
+      licenseRemaining: document.getElementById('license-remaining'),
+      licenseUpdated: document.getElementById('license-updated'),
+      licenseMetadata: document.getElementById('license-metadata'),
+      editLicense: document.getElementById('edit-license'),
+      deleteLicense: document.getElementById('delete-license'),
+      refreshActivations: document.getElementById('refresh-activations'),
+      resetActivations: document.getElementById('reset-activations'),
+      activationsTable: document.querySelector('#activations-table tbody'),
+      trialFingerprint: document.getElementById('trial-fingerprint'),
+      trialClient: document.getElementById('trial-client'),
+      trialStatusPill: document.getElementById('trial-status'),
+      trialStatusText: document.getElementById('trial-status-text'),
+      trialStarted: document.getElementById('trial-started'),
+      trialExpires: document.getElementById('trial-expires'),
+      trialRemaining: document.getElementById('trial-remaining'),
+      trialMetadata: document.getElementById('trial-metadata'),
+      trialCancel: document.getElementById('trial-cancel'),
+      trialConvert: document.getElementById('trial-convert'),
+      trialEdit: document.getElementById('trial-edit'),
+      trialDelete: document.getElementById('trial-delete'),
+      licenseDialog: document.getElementById('license-dialog'),
+      licenseForm: document.getElementById('license-form'),
+      dialogTitle: document.getElementById('dialog-title'),
+      dialogSubmit: document.getElementById('dialog-submit'),
+      dialogCancel: document.getElementById('dialog-cancel'),
+      licenseKeyField: document.getElementById('license-key-field'),
+      formKey: document.getElementById('form-key'),
+      formMax: document.getElementById('form-max'),
+      formStatus: document.getElementById('form-status'),
+      formMetadata: document.getElementById('form-metadata'),
+      confirmDialog: document.getElementById('confirm-dialog'),
+      confirmMessage: document.getElementById('confirm-message'),
+      toast: document.getElementById('toast'),
+      trialDialog: document.getElementById('trial-dialog'),
+      trialForm: document.getElementById('trial-form'),
+      trialDialogCancel: document.getElementById('trial-dialog-cancel'),
+      trialDialogSubmit: document.getElementById('trial-dialog-submit'),
+      trialFormClient: document.getElementById('trial-form-client'),
+      trialFormStatus: document.getElementById('trial-form-status'),
+      trialFormExpires: document.getElementById('trial-form-expires'),
+      trialFormMetadata: document.getElementById('trial-form-metadata'),
+    };
+
+    const state = {
+      config: null,
+      viewMode: 'licenses',
+      licenses: [],
+      trials: [],
+      selectedLicense: null,
+      selectedTrial: null,
+      licensePage: 0,
+      trialPage: 0,
+    };
+
+    function showToast(message, type = 'info', timeout = 3000) {
+      elements.toast.textContent = message;
+      elements.toast.className = `toast ${type}`;
+      elements.toast.classList.remove('hidden');
+      if (timeout) {
+        setTimeout(() => elements.toast.classList.add('hidden'), timeout);
+      }
+    }
+
+    function loadConfig() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (parsed.baseUrl && parsed.token) {
+          return parsed;
+        }
+      } catch (error) {
+        console.warn('Failed to parse config', error);
+      }
+      return null;
+    }
+
+    function saveConfig(config) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+      state.config = config;
+    }
+
+    function toggleConfigPanel(show) {
+      const shouldShow = show ?? elements.configPanel.classList.contains('hidden');
+      elements.configPanel.classList.toggle('hidden', !shouldShow);
+      if (shouldShow) {
+        elements.apiBase.value = state.config?.baseUrl ?? '';
+        elements.apiToken.value = state.config?.token ?? '';
+      }
+    }
+
+    async function request(path, options = {}) {
+      if (!state.config) {
+        throw new Error('Connection not configured');
+      }
+      const url = `${state.config.baseUrl.replace(/\/$/, '')}${path}`;
+      const headers = new Headers(options.headers || {});
+      headers.set('Authorization', `Bearer ${state.config.token}`);
+      headers.set('Content-Type', 'application/json');
+
+      const response = await fetch(url, { ...options, headers });
+      if (!response.ok) {
+        let message = `${response.status} ${response.statusText}`;
+        try {
+          const data = await response.json();
+          if (data?.message) {
+            message = data.message;
+          }
+        } catch (_) {
+          // ignore JSON parse errors for error handling
+        }
+        throw new Error(message);
+      }
+
+      if (response.status === 204) {
+        return null;
+      }
+
+      const text = await response.text();
+      return text ? JSON.parse(text) : null;
+    }
+
+    function formatDate(value) {
+      if (!value) return '—';
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString();
+    }
+
+    function computeRemainingDays(value) {
+      if (!value) return null;
+      const expires = new Date(value);
+      if (Number.isNaN(expires.getTime())) return null;
+      const now = new Date();
+      const diff = expires.getTime() - now.getTime();
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+      return days < 0 ? 0 : days;
+    }
+
+    function toDateTimeLocalValue(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      const pad = (num) => String(num).padStart(2, '0');
+      return [
+        `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
+        `${pad(date.getHours())}:${pad(date.getMinutes())}`,
+      ].join('T');
+    }
+
+    function setEmptyStateVisible(isVisible, message) {
+      if (typeof message === 'string') {
+        elements.emptyStateMessage.textContent = message;
+      }
+      elements.emptyState.classList.toggle('hidden', !isVisible);
+      elements.emptyState.setAttribute('aria-hidden', String(!isVisible));
+    }
+
+    function updateModeUI() {
+      elements.modeLicenses.classList.toggle('active', state.viewMode === 'licenses');
+      elements.modeTrials.classList.toggle('active', state.viewMode === 'trials');
+      elements.licenseToolbar.style.display = state.viewMode === 'licenses' ? 'flex' : 'none';
+      elements.listTitle.textContent = state.viewMode === 'licenses' ? 'Licenses' : 'Trials';
+
+      const hasLicense = Boolean(state.selectedLicense);
+      const hasTrial = Boolean(state.selectedTrial);
+
+      const emptyMessage = state.viewMode === 'licenses'
+        ? 'Select a license to view details'
+        : 'Select a trial to view details';
+      const shouldShowEmpty = (state.viewMode === 'licenses' && !hasLicense)
+        || (state.viewMode === 'trials' && !hasTrial);
+
+      setEmptyStateVisible(shouldShowEmpty, emptyMessage);
+
+      elements.licenseDetails.classList.toggle('hidden', state.viewMode !== 'licenses' || !hasLicense);
+      elements.trialDetails.classList.toggle('hidden', state.viewMode !== 'trials' || !hasTrial);
+
+      elements.editLicense.disabled = !hasLicense;
+      elements.deleteLicense.disabled = !hasLicense;
+      elements.refreshActivations.disabled = !hasLicense;
+      elements.resetActivations.disabled = !hasLicense;
+      elements.trialCancel.disabled = !hasTrial;
+      elements.trialConvert.disabled = !hasTrial;
+    }
+
+    function renderLicensesList() {
+      elements.listContainer.innerHTML = '';
+      if (!state.licenses.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.innerHTML = '<p>No licenses found</p>';
+        elements.listContainer.append(empty);
+        return;
+      }
+
+      state.licenses.forEach((license) => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        if (state.selectedLicense?.id === license.id) {
+          item.classList.add('active');
+        }
+        item.innerHTML = `
+          <h4>${license.key}</h4>
+          <div class="meta">
+            <span>${license.status.toUpperCase()}</span>
+            <span>${license.activation_count}/${license.max_activations}</span>
+          </div>
+        `;
+        item.addEventListener('click', () => selectLicense(license));
+        elements.listContainer.append(item);
+      });
+    }
+
+    function renderTrialsList() {
+      elements.listContainer.innerHTML = '';
+      if (!state.trials.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.innerHTML = '<p>No trials found</p>';
+        elements.listContainer.append(empty);
+        return;
+      }
+
+      state.trials.forEach((trial) => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        if (state.selectedTrial?.id === trial.id) {
+          item.classList.add('active');
+        }
+        const remaining = trial.days_remaining ?? computeRemainingDays(trial.expires_at);
+        const remainingText = remaining != null ? `${remaining} days left` : '—';
+        item.innerHTML = `
+          <h4>${trial.device_fingerprint}</h4>
+          <div class="meta">
+            <span>${trial.status.toUpperCase()}</span>
+            <span>${remainingText}</span>
+          </div>
+        `;
+        item.addEventListener('click', () => selectTrial(trial));
+        elements.listContainer.append(item);
+      });
+    }
+
+    function updatePager(count) {
+      const page = state.viewMode === 'licenses' ? state.licensePage : state.trialPage;
+      elements.pageInfo.textContent = `Page ${page + 1}`;
+      elements.prevPage.disabled = page === 0;
+      elements.nextPage.disabled = count < PAGE_SIZE;
+    }
+
+    function renderLicenseDetails() {
+      const license = state.selectedLicense;
+      if (!license) {
+        if (state.viewMode === 'licenses') {
+          setEmptyStateVisible(true);
+        }
+        elements.licenseDetails.classList.add('hidden');
+        elements.editLicense.disabled = true;
+        elements.deleteLicense.disabled = true;
+        elements.refreshActivations.disabled = true;
+        elements.resetActivations.disabled = true;
+        return;
+      }
+
+      setEmptyStateVisible(false);
+      elements.licenseDetails.classList.remove('hidden');
+      elements.trialDetails.classList.add('hidden');
+
+      elements.licenseKey.textContent = license.key;
+      elements.licenseId.textContent = license.id;
+      elements.licenseStatus.textContent = license.status;
+      elements.licenseStatus.dataset.status = license.status;
+      elements.licenseMax.textContent = license.max_activations;
+      elements.licenseCount.textContent = license.activation_count;
+      elements.licenseRemaining.textContent = license.max_activations - license.activation_count;
+      elements.licenseUpdated.textContent = formatDate(license.updated_at);
+
+      if (license.metadata) {
+        try {
+          const meta = typeof license.metadata === 'string'
+            ? JSON.parse(license.metadata)
+            : license.metadata;
+          elements.licenseMetadata.textContent = JSON.stringify(meta, null, 2);
+        } catch (_) {
+          elements.licenseMetadata.textContent = license.metadata;
+        }
+      } else {
+        elements.licenseMetadata.textContent = 'None';
+      }
+
+      elements.editLicense.disabled = false;
+      elements.deleteLicense.disabled = false;
+      elements.refreshActivations.disabled = false;
+      elements.resetActivations.disabled = false;
+    }
+
+    function renderTrialDetails() {
+      const trial = state.selectedTrial;
+      if (!trial) {
+        if (state.viewMode === 'trials') {
+          setEmptyStateVisible(true);
+        }
+        elements.trialDetails.classList.add('hidden');
+        elements.trialCancel.disabled = true;
+        elements.trialConvert.disabled = true;
+        elements.trialEdit.disabled = true;
+        elements.trialDelete.disabled = true;
+        return;
+      }
+
+      setEmptyStateVisible(false);
+      elements.trialDetails.classList.remove('hidden');
+      elements.licenseDetails.classList.add('hidden');
+
+      elements.trialFingerprint.textContent = trial.device_fingerprint;
+      elements.trialClient.textContent = trial.client_id ?? '—';
+      elements.trialStatusPill.dataset.status = trial.status;
+      elements.trialStatusPill.textContent = trial.status.toUpperCase();
+      elements.trialStatusText.textContent = trial.status;
+      elements.trialStarted.textContent = formatDate(trial.started_at);
+      elements.trialExpires.textContent = formatDate(trial.expires_at);
+
+      const remaining = trial.days_remaining ?? computeRemainingDays(trial.expires_at);
+      elements.trialRemaining.textContent = remaining != null ? remaining : '—';
+
+      if (trial.metadata) {
+        try {
+          const meta = typeof trial.metadata === 'string'
+            ? JSON.parse(trial.metadata)
+            : trial.metadata;
+          elements.trialMetadata.textContent = JSON.stringify(meta, null, 2);
+        } catch (_) {
+          elements.trialMetadata.textContent = trial.metadata;
+        }
+      } else {
+        elements.trialMetadata.textContent = 'None';
+      }
+
+      elements.trialCancel.disabled = false;
+      elements.trialConvert.disabled = false;
+      elements.trialEdit.disabled = false;
+      elements.trialDelete.disabled = false;
+    }
+
+    function renderActivations(list = []) {
+      elements.activationsTable.innerHTML = '';
+      if (!list.length) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 5;
+        cell.textContent = 'No activations recorded';
+        row.append(cell);
+        elements.activationsTable.append(row);
+        return;
+      }
+
+      list.forEach((activation) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${formatDate(activation.occurred_at)}</td>
+          <td>${activation.client_id ?? '—'}</td>
+          <td>${activation.device_fingerprint ?? '—'}</td>
+          <td>${activation.ip}</td>
+          <td title="${activation.user_agent}">${activation.user_agent}</td>
+        `;
+        elements.activationsTable.append(row);
+      });
+    }
+
+    async function loadLicenses() {
+      try {
+        const offset = state.licensePage * PAGE_SIZE;
+        const data = await request(`/admin/licenses?limit=${PAGE_SIZE}&offset=${offset}`);
+        state.licenses = data?.licenses ?? [];
+
+        if (state.selectedLicense) {
+          const updated = state.licenses.find((license) => license.id === state.selectedLicense.id);
+          state.selectedLicense = updated ?? null;
+        }
+
+        renderLicensesList();
+        updatePager(state.licenses.length);
+        renderLicenseDetails();
+        if (state.selectedLicense) {
+          await loadActivations();
+        } else {
+          renderActivations([]);
+        }
+      } catch (error) {
+        console.error(error);
+        showToast(`Failed to load licenses: ${error.message}`, 'error');
+      }
+    }
+
+    async function loadTrials() {
+      try {
+        const offset = state.trialPage * PAGE_SIZE;
+        const data = await request(`/admin/trials?limit=${PAGE_SIZE}&offset=${offset}`);
+        state.trials = data?.trials ?? [];
+
+        if (state.selectedTrial) {
+          const updated = state.trials.find((trial) => trial.id === state.selectedTrial.id);
+          state.selectedTrial = updated ?? null;
+        }
+
+        renderTrialsList();
+        updatePager(state.trials.length);
+        renderTrialDetails();
+      } catch (error) {
+        console.error(error);
+        showToast(`Failed to load trials: ${error.message}`, 'error');
+      }
+    }
+
+    function loadCurrentView() {
+      updateModeUI();
+      if (state.viewMode === 'licenses') {
+        loadLicenses();
+      } else {
+        loadTrials();
+      }
+    }
+
+    async function selectLicense(license) {
+      state.selectedLicense = license;
+      state.selectedTrial = null;
+      renderLicensesList();
+      renderLicenseDetails();
+      await loadActivations();
+      updateModeUI();
+    }
+
+    function selectTrial(trial) {
+      state.selectedTrial = trial;
+      state.selectedLicense = null;
+      renderTrialsList();
+      renderTrialDetails();
+      renderActivations([]);
+      updateModeUI();
+    }
+
+    async function loadActivations() {
+      if (!state.selectedLicense) return;
+      try {
+        elements.refreshActivations.disabled = true;
+        const data = await request(`/admin/licenses/${state.selectedLicense.id}/activations`);
+        renderActivations(data?.activations ?? []);
+      } catch (error) {
+        console.error(error);
+        showToast(`Failed to load activations: ${error.message}`, 'error');
+      } finally {
+        elements.refreshActivations.disabled = !state.selectedLicense;
+      }
+    }
+
+    function openLicenseDialog(mode, license = null) {
+      elements.dialogTitle.textContent = mode === 'edit' ? 'Edit License' : 'New License';
+      elements.dialogSubmit.textContent = mode === 'edit' ? 'Save Changes' : 'Create';
+      elements.licenseDialog.dataset.mode = mode;
+      elements.licenseDialog.dataset.licenseId = license?.id ?? '';
+
+      if (mode === 'edit' && license) {
+        elements.licenseKeyField.style.display = 'none';
+        elements.formKey.required = false;
+        elements.formKey.value = license.key;
+        elements.formMax.value = license.max_activations;
+        elements.formStatus.value = license.status;
+        elements.formMetadata.value = license.metadata ? JSON.stringify(license.metadata, null, 2) : '';
+      } else {
+        elements.licenseKeyField.style.display = '';
+        elements.formKey.required = true;
+        elements.formKey.value = '';
+        elements.formMax.value = 5;
+        elements.formStatus.value = 'active';
+        elements.formMetadata.value = '';
+      }
+
+      elements.licenseDialog.showModal();
+    }
+
+    function openTrialDialog() {
+      const trial = state.selectedTrial;
+      if (!trial) return;
+
+      elements.trialFormClient.value = trial.client_id ?? '';
+      elements.trialFormStatus.value = trial.status;
+      elements.trialFormExpires.value = toDateTimeLocalValue(trial.expires_at ?? trial.expiresAt);
+
+      if (trial.metadata) {
+        try {
+          const meta = typeof trial.metadata === 'string'
+            ? JSON.parse(trial.metadata)
+            : trial.metadata;
+          elements.trialFormMetadata.value = JSON.stringify(meta, null, 2);
+        } catch (_) {
+          elements.trialFormMetadata.value = String(trial.metadata);
+        }
+      } else {
+        elements.trialFormMetadata.value = '';
+      }
+
+      elements.trialDialog.showModal();
+    }
+
+    function closeTrialDialog() {
+      if (!elements.trialDialog.open) return;
+      elements.trialForm.reset();
+      elements.trialDialog.close();
+    }
+
+    function closeDialogs() {
+      if (elements.licenseDialog.open) {
+        elements.licenseDialog.close();
+        elements.licenseForm.reset();
+        elements.licenseDialog.dataset.mode = '';
+        elements.licenseDialog.dataset.licenseId = '';
+        elements.licenseKeyField.style.display = '';
+        elements.formKey.required = true;
+      }
+      closeTrialDialog();
+      if (elements.confirmDialog.open) {
+        elements.confirmDialog.close();
+      }
+    }
+
+    function promptConfirm(message) {
+      elements.confirmMessage.textContent = message;
+      elements.confirmDialog.showModal();
+      return new Promise((resolve) => {
+        elements.confirmDialog.addEventListener(
+          'close',
+          () => resolve(elements.confirmDialog.returnValue === 'confirm'),
+          { once: true }
+        );
+      });
+    }
+
+    async function handleCreateOrUpdate(event) {
+      event.preventDefault();
+      const mode = elements.licenseDialog.dataset.mode;
+      const payload = {
+        max_activations: Number(elements.formMax.value),
+        status: elements.formStatus.value,
+      };
+
+      if (elements.formMetadata.value.trim()) {
+        try {
+          payload.metadata = JSON.parse(elements.formMetadata.value);
+        } catch (error) {
+          showToast('Metadata must be valid JSON', 'error');
+          return;
+        }
+      }
+
+      try {
+        if (mode === 'edit') {
+          const id = elements.licenseDialog.dataset.licenseId;
+          await request(`/admin/licenses/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+          showToast('License updated', 'success');
+        } else {
+          payload.key = elements.formKey.value.trim();
+          if (!payload.key) {
+            showToast('License key is required', 'error');
+            return;
+          }
+          await request('/admin/licenses', { method: 'POST', body: JSON.stringify(payload) });
+          showToast('License created', 'success');
+          state.licensePage = 0;
+        }
+        closeDialogs();
+        await loadLicenses();
+      } catch (error) {
+        console.error(error);
+        showToast(`Save failed: ${error.message}`, 'error');
+      }
+    }
+
+    async function handleDeleteLicense() {
+      if (!state.selectedLicense) return;
+      const confirmed = await promptConfirm('Delete this license? This cannot be undone.');
+      if (!confirmed) return;
+
+      try {
+        await request(`/admin/licenses/${state.selectedLicense.id}`, { method: 'DELETE' });
+        showToast('License deleted', 'success');
+        state.selectedLicense = null;
+        await loadLicenses();
+      } catch (error) {
+        console.error(error);
+        showToast(`Delete failed: ${error.message}`, 'error');
+      }
+    }
+
+    async function handleResetActivations() {
+      if (!state.selectedLicense) return;
+      const confirmed = await promptConfirm('Reset activation count and delete all activation records?');
+      if (!confirmed) return;
+
+      try {
+        const data = await request(
+          `/admin/licenses/${state.selectedLicense.id}/reset-activations`,
+          { method: 'POST' }
+        );
+        showToast(`Cleared ${data?.activations_cleared ?? 0} activations`, 'success');
+        state.selectedLicense = data?.license ?? state.selectedLicense;
+        await loadLicenses();
+      } catch (error) {
+        console.error(error);
+        showToast(`Reset failed: ${error.message}`, 'error');
+      }
+    }
+
+    async function handleTrialUpdate(event) {
+      event.preventDefault();
+      if (!state.selectedTrial) return;
+
+      const clientId = elements.trialFormClient.value.trim();
+      const status = elements.trialFormStatus.value;
+      const expiresValue = elements.trialFormExpires.value;
+      const metadataRaw = elements.trialFormMetadata.value.trim();
+
+      if (!expiresValue) {
+        showToast('Expires at is required', 'error');
+        return;
+      }
+
+      let metadata;
+      if (metadataRaw) {
+        try {
+          metadata = JSON.parse(metadataRaw);
+        } catch (error) {
+          showToast(`Invalid metadata JSON: ${error.message}`, 'error');
+          return;
+        }
+      }
+
+      const payload = {
+        status,
+        expires_at: new Date(expiresValue).toISOString(),
+        client_id: clientId || null,
+        metadata: metadata ?? null,
+      };
+
+      try {
+        await request(`/admin/trials/${state.selectedTrial.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+        });
+        showToast('Trial updated', 'success');
+        closeTrialDialog();
+        await loadTrials();
+      } catch (error) {
+        console.error(error);
+        showToast(`Update failed: ${error.message}`, 'error');
+      }
+    }
+
+    async function handleDeleteTrial() {
+      if (!state.selectedTrial) return;
+      const confirmed = await promptConfirm('Delete this trial permanently?');
+      if (!confirmed) return;
+
+      try {
+        await request(`/admin/trials/${state.selectedTrial.id}`, { method: 'DELETE' });
+        showToast('Trial deleted', 'success');
+        state.selectedTrial = null;
+        await loadTrials();
+      } catch (error) {
+        console.error(error);
+        showToast(`Delete failed: ${error.message}`, 'error');
+      }
+    }
+
+    async function handleTrialStatusChange(status) {
+      if (!state.selectedTrial) return;
+      try {
+        await request(`/admin/trials/${state.selectedTrial.id}/status`, {
+          method: 'POST',
+          body: JSON.stringify({ status }),
+        });
+        showToast('Trial status updated', 'success');
+        await loadTrials();
+      } catch (error) {
+        console.error(error);
+        showToast(`Update failed: ${error.message}`, 'error');
+      }
+    }
+
+    function switchMode(mode) {
+      state.viewMode = mode;
+      updateModeUI();
+      loadCurrentView();
+    }
+
+    function bindEvents() {
+      elements.toggleConfig.addEventListener('click', () => toggleConfigPanel());
+      elements.configCancel.addEventListener('click', () => toggleConfigPanel(false));
+      elements.configForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const config = {
+          baseUrl: elements.apiBase.value.trim().replace(/\/$/, ''),
+          token: elements.apiToken.value.trim(),
+        };
+        if (!config.baseUrl || !config.token) {
+          showToast('Base URL and token are required', 'error');
+          return;
+        }
+        saveConfig(config);
+        toggleConfigPanel(false);
+        loadCurrentView();
+      });
+
+      elements.refreshButton.addEventListener('click', () => loadCurrentView());
+      elements.modeLicenses.addEventListener('click', () => switchMode('licenses'));
+      elements.modeTrials.addEventListener('click', () => switchMode('trials'));
+
+      elements.prevPage.addEventListener('click', () => {
+        if (state.viewMode === 'licenses' && state.licensePage > 0) {
+          state.licensePage -= 1;
+          loadLicenses();
+        } else if (state.viewMode === 'trials' && state.trialPage > 0) {
+          state.trialPage -= 1;
+          loadTrials();
+        }
+      });
+
+      elements.nextPage.addEventListener('click', () => {
+        if (state.viewMode === 'licenses') {
+          state.licensePage += 1;
+          loadLicenses();
+        } else {
+          state.trialPage += 1;
+          loadTrials();
+        }
+      });
+
+      elements.createLicense.addEventListener('click', () => openLicenseDialog('create'));
+      elements.editLicense.addEventListener('click', () => {
+        if (state.selectedLicense) {
+          openLicenseDialog('edit', state.selectedLicense);
+        }
+      });
+      elements.deleteLicense.addEventListener('click', handleDeleteLicense);
+      elements.licenseForm.addEventListener('submit', handleCreateOrUpdate);
+      elements.dialogCancel.addEventListener('click', () => closeDialogs());
+      elements.licenseDialog.addEventListener('cancel', () => closeDialogs());
+
+      elements.refreshActivations.addEventListener('click', loadActivations);
+      elements.resetActivations.addEventListener('click', handleResetActivations);
+
+      elements.trialCancel.addEventListener('click', () => handleTrialStatusChange('cancelled'));
+      elements.trialConvert.addEventListener('click', () => handleTrialStatusChange('converted'));
+      elements.trialEdit.addEventListener('click', openTrialDialog);
+      elements.trialDelete.addEventListener('click', handleDeleteTrial);
+      elements.trialForm.addEventListener('submit', handleTrialUpdate);
+      elements.trialDialogCancel.addEventListener('click', () => closeTrialDialog());
+      elements.trialDialog.addEventListener('cancel', () => closeTrialDialog());
+
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          closeDialogs();
+          toggleConfigPanel(false);
+        }
+      });
+    }
+
+    function init() {
+      bindEvents();
+      state.config = loadConfig();
+      updateModeUI();
+      if (!state.config) {
+        toggleConfigPanel(true);
+        showToast('Configure connection settings to begin', 'info', 4000);
+      } else {
+        loadCurrentView();
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

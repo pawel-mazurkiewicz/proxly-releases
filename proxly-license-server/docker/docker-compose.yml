@@ -1,0 +1,74 @@
+name: proxly-license-server
+services:
+  proxly-license-server-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: proxly
+      POSTGRES_PASSWORD: proxly
+      POSTGRES_DB: proxly
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U proxly -d proxly"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - proxly-network
+
+  proxly-license-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      APP_PORT: 3939
+      DB_DRIVER: postgres
+      DB_DSN: postgres://proxly:proxly@proxly-license-server-db:5432/proxly?sslmode=disable
+      JWT_ADMIN_SECRET: ${JWT_ADMIN_SECRET:-change-me-in-production}
+      CLIENT_SIG_ALGO: hmac
+      DEFAULT_MAX_ACTIVATIONS: 5
+      AUTO_CREATE_ON_ACTIVATION: 'false'
+      WEBHOOK_TIMEOUT_MS: 3000
+      RATE_LIMIT_PER_LICENSE_PER_MIN: 10
+      RATE_LIMIT_PER_IP_PER_MIN: 30
+      LOG_LEVEL: info
+    ports:
+      - "3939:3939"
+    depends_on:
+      proxly-license-server-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3939/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - proxly-network
+
+  # Optional: metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9191:9191"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - proxly-network
+    profiles:
+      - monitoring
+
+volumes:
+  dbdata:
+
+networks:
+  proxly-network:
+    driver: bridge

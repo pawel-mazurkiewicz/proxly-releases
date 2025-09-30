@@ -1,0 +1,504 @@
+openapi: 3.0.0
+info:
+  title: Proxly License Server API
+  description: API for managing license keys and activations
+  version: 1.0.0
+  contact:
+    name: Proxly License Server
+    url: https://github.com/pawel-mazurkiewicz/proxly-license-server
+
+servers:
+  - url: http://localhost:8080/v1
+    description: Development server
+
+paths:
+  /activate:
+    post:
+      summary: Activate a license key
+      description: Processes license activation and returns activation details
+      security:
+        - HMACSignature: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivationRequest'
+      responses:
+        '200':
+          description: Activation successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivationResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: License revoked, expired, or suspended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit exceeded or activation limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /admin/licenses:
+    get:
+      summary: List licenses
+      description: Retrieve a paginated list of licenses
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: List of licenses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  licenses:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/License'
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+
+    post:
+      summary: Create a new license
+      description: Creates a new license key
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLicenseRequest'
+      responses:
+        '201':
+          description: License created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/License'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /admin/licenses/{id}:
+    get:
+      summary: Get license by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: License details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/License'
+        '404':
+          description: License not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update license
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLicenseRequest'
+      responses:
+        '200':
+          description: License updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/License'
+
+    delete:
+      summary: Delete license
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: License deleted successfully
+        '404':
+          description: License not found
+
+  /admin/licenses/{id}/activations:
+    get:
+      summary: List activations for a license
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Activation history for the license
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LicenseActivationsResponse'
+        '404':
+          description: License not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /admin/licenses/{id}/reset-activations:
+    post:
+      summary: Reset activation count for a license
+      description: Deletes all activation records for the license and resets the activation counter to zero.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Activation count reset successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetActivationsResponse'
+        '404':
+          description: License not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /admin/webhooks:
+    get:
+      summary: List webhooks
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of webhooks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  webhooks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Webhook'
+
+    post:
+      summary: Create webhook
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookRequest'
+      responses:
+        '201':
+          description: Webhook created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+
+  /healthz:
+    get:
+      summary: Health check
+      description: Returns the health status of the service
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /metrics:
+    get:
+      summary: Prometheus metrics
+      description: Returns Prometheus metrics
+      responses:
+        '200':
+          description: Metrics data
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  securitySchemes:
+    HMACSignature:
+      type: apiKey
+      in: header
+      name: X-Signature
+      description: HMAC-SHA256 signature of timestamp + clientId + body
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ActivationRequest:
+      type: object
+      properties:
+        license_key:
+          type: string
+          description: The license key to activate
+        client_id:
+          type: string
+          description: Optional client identifier
+        user_agent:
+          type: string
+          description: Optional user agent string
+      required:
+        - license_key
+
+    ActivationResponse:
+      type: object
+      properties:
+        license_id:
+          type: string
+          format: uuid
+        activation_count:
+          type: integer
+        max_activations:
+          type: integer
+        remaining_activations:
+          type: integer
+        status:
+          type: string
+          enum: [ok, at_threshold, exceeded]
+
+    Activation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        license_id:
+          type: string
+          format: uuid
+        client_id:
+          type: string
+          nullable: true
+        device_fingerprint:
+          type: string
+          nullable: true
+        ip:
+          type: string
+        user_agent:
+          type: string
+        occurred_at:
+          type: string
+          format: date-time
+
+    License:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        key:
+          type: string
+        max_activations:
+          type: integer
+        activation_count:
+          type: integer
+        status:
+          type: string
+          enum: [active, revoked, suspended, expired]
+        metadata:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateLicenseRequest:
+      type: object
+      properties:
+        key:
+          type: string
+        max_activations:
+          type: integer
+          minimum: 1
+        metadata:
+          type: string
+          nullable: true
+      required:
+        - key
+        - max_activations
+
+    UpdateLicenseRequest:
+      type: object
+      properties:
+        max_activations:
+          type: integer
+          minimum: 1
+        status:
+          type: string
+          enum: [active, revoked, suspended, expired]
+        metadata:
+          type: string
+          nullable: true
+
+    LicenseActivationsResponse:
+      type: object
+      properties:
+        license_id:
+          type: string
+          format: uuid
+        count:
+          type: integer
+        activations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Activation'
+
+    ResetActivationsResponse:
+      type: object
+      properties:
+        license:
+          $ref: '#/components/schemas/License'
+        activations_cleared:
+          type: integer
+
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        url:
+          type: string
+          format: uri
+        secret:
+          type: string
+          nullable: true
+        events:
+          type: array
+          items:
+            type: string
+
+    CreateWebhookRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        secret:
+          type: string
+        events:
+          type: array
+          items:
+            type: string
+      required:
+        - url
+        - events
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+        checks:
+          type: object
+          additionalProperties:
+            type: string
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        details:
+          type: string
