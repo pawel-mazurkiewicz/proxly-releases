@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Proxly Updates</title>
+    <link>https://github.com/pawel-mazurkiewicz/proxly-releases</link>
+    <description>Updates for Proxly - Smart Browser Chooser</description>
+    <language>en</language>
+    <item>
+      <title>Version 1.4.1</title>
+      <description><![CDATA[<ul>
+<li>Fixed a bug when a rule contained just .* pattern it would crash the app due to incorrect logic applied on splicing the pattern</li>
+</ul>]]></description>
+      <pubDate>Tue, 30 Sep 2025 22:06:47 +0000</pubDate>
+      <sparkle:version>146</sparkle:version>
+      <sparkle:shortVersionString>1.4.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <enclosure 
+        url="https://github.com/pawel-mazurkiewicz/proxly-releases/releases/download/v1.4.1/Proxly.dmg"
+        length="7088557"
+        type="application/x-apple-diskimage"
+        sparkle:edSignature="WxWQS+JWeX0r0nL9jV5TB2fvzUlh52sm+9NApGO5w8KKzuZ4k8cQQ8LamrBv3TC0cykVWS0Xtxq4VaqRn+7RAA==" />
+    </item>
+  </channel>
+</rss>
