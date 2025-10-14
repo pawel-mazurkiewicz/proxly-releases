@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Proxly Updates</title>
+    <link>https://github.com/pawel-mazurkiewicz/proxly-releases</link>
+    <description>Updates for Proxly - Smart Browser Chooser</description>
+    <language>en</language>
+    <item>
+      <title>Version 1.4.2</title>
+      <description><![CDATA[<ul>
+</ul>]]></description>
+      <pubDate>Tue, 14 Oct 2025 20:28:39 +0000</pubDate>
+      <sparkle:version>136</sparkle:version>
+      <sparkle:shortVersionString>1.4.2</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <enclosure 
+        url="https://github.com/pawel-mazurkiewicz/proxly-releases/releases/download/v1.4.2/Proxly.dmg"
+        length="7088177"
+        type="application/x-apple-diskimage"
+        sparkle:edSignature="6fuyBbd+h14SC9yPVogBwHCrqkt/n+WuzNYfwJ1PgAhG6frFBhHqeJ1ZBCP8G6UEfnaw/zuXawbqi3PIvQoYBw==" />
+    </item>
+  </channel>
+</rss>
