@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Proxly Updates</title>
+    <link>https://github.com/pawel-mazurkiewicz/proxly-releases</link>
+    <description>Updates for Proxly - Smart Browser Chooser</description>
+    <language>en</language>
+    <item>
+      <title>Version 1.5.0</title>
+      <description><![CDATA[<ul>
+<li>**Template Mode**: Use simple variables like `{host}`, `{path}`, `{query:param}`, and `{pathComponent:index}` to redirect URLs</li>
+<li>**JavaScript Mode**: Write custom transformation logic with full JavaScript support in a sandboxed environment</li>
+<li>**Live Preview**: See your transformations in action with real-time validation and examples</li>
+<li>**Use Cases**: Redirect to alternative front-ends (e.g., Twitter → Nitter), remove tracking parameters, or create custom URL rewrites</li>
+<li>**Create & Configure**: Set up multiple Safari profiles with custom names and SF Symbol icons</li>
+<li>**Smart Window Routing**: Automatically route URLs to specific Safari windows based on your rules</li>
+<li>**Seamless Integration**: Configure Safari profiles just like Chrome or Firefox profiles in your routing rules</li>
+<li>**Drag & Drop**: Reorder browsers and their profiles in the management view (https://github.com/pawel-mazurkiewicz/proxly-releases/issues/7)</li>
+<li>**Custom Shortcuts**: Your order determines keyboard shortcuts (1-9) in the selection panel</li>
+<li>**Profile Reordering**: Arrange profiles within each browser to optimize your workflow</li>
+<li>**Reset Option**: Easily revert to alphabetical sorting</li>
+<li>**Supported Apps**: Zoom, Discord, Spotify, Figma, Trello, Linear</li>
+<li>**Auto-Detection**: Only shows installed applications in the preset picker</li>
+<li>**Per-Rule Configuration**: Enable native app routing on any rule</li>
+<li>**Smart Fallback**: Automatically falls back to browser if transformation fails</li>
+<li>**Query String Matching**: URL processor now includes query parameters in pattern matching for more precise rules (Example: transforming these hideous MS Teams links to something usable - they contain proper link in their query section)</li>
+<li>Improved browser profile data persistence during cold launches</li>
+<li>Fixed critical crash when matching wildcard host patterns (e.g., `*.slack.com`) against apex domains</li>
+<li>Better Duplicate Detection Rule imports now consider transformation logic to prevent false duplicates</li>
+<li>Fixed onboarding window management to prevent "ghost" windows (https://github.com/pawel-mazurkiewicz/proxly-releases/issues/9)</li>
+</ul>]]></description>
+      <pubDate>Fri, 14 Nov 2025 22:21:45 +0000</pubDate>
+      <sparkle:version>164</sparkle:version>
+      <sparkle:shortVersionString>1.5.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <enclosure 
+        url="https://github.com/pawel-mazurkiewicz/proxly-releases/releases/download/v1.5.0/Proxly.dmg"
+        length="7845984"
+        type="application/x-apple-diskimage"
+        sparkle:edSignature="2X1d+5kHrbWhbuG43J+ldR93ZVuPHW8pMjzfZip8+bGTFrB6Bgw+YlfqmAfH83s5T1E6RNpXdPzd8yI6bxX3Aw==" />
+    </item>
+  </channel>
+</rss>
