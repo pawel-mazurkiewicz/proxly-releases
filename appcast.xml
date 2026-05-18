@@ -6,19 +6,147 @@
     <description>Updates for Proxly - Smart Browser Chooser</description>
     <language>en</language>
     <item>
-      <title>Version 1.6.2</title>
-      <description><![CDATA[<h3 id="fixed">Fixed</h3>
+      <title>Version 1.7.0</title>
+      <description><![CDATA[<h3 id="added">Added</h3>
 <ul>
-<li>Fixed issue with rendering new fonts</li>
+<li><strong>Link History</strong>: A new History view shows every link
+Proxly has routed, where it went, and which rule matched
+<ul>
+<li>Split-view layout with sidebar, search, filtering and date
+grouping</li>
+<li>Detail view with metadata cards (rule, browser, match type, source
+app)</li>
+<li>In an entry details pane you can click a button to instantly create
+a rule from it</li>
+<li>Per-rule “Exclude from History” toggle for sensitive rules</li>
+<li>Recent history section accessible directly from the menu bar</li>
+</ul></li>
+<li><strong>Rule Exclusion Patterns</strong>: Each rule can now declare
+patterns that <em>exclude</em> a URL even when the main domain pattern
+would have matched it
+<ul>
+<li>Example: a “Slack” rule matching <code>*.slack.com</code> can
+exclude <code>auth.slack.com</code> so login flows go to your default
+browser</li>
+<li>Patterns support the same wildcard/regex syntax as the main domain
+pattern</li>
+<li>Visible inline in the Rule Editor under a dedicated disclosure
+group</li>
+<li>Exclusions sync via iCloud and are preserved across
+import/export</li>
+</ul></li>
+<li><strong>Mailto: Link Routing</strong>: Open <code>mailto:</code>
+links with the email client of your choice instead of whatever macOS
+decided
+<ul>
+<li>Manage your installed mail apps in Settings with drag-to-reorder and
+visibility toggles</li>
+<li>Per-rule mail app selection, alongside browser and native-app
+targets</li>
+<li>Email rules show a clear Email badge in the rule list</li>
+</ul></li>
+<li><strong>Private Mode for Profiles</strong>: Open links in a
+private/incognito window straight from a rule
+<ul>
+<li>Toggle on any browser profile in the Rule Editor</li>
+<li>Hold Option while clicking a browser in the Selection Panel to open
+privately on-the-fly</li>
+<li>Works for Chrome, Edge, Brave, Firefox, and Safari (via
+AppleScript)</li>
+</ul></li>
+<li><strong>Short URL Expansion</strong>: Shortened URLs (bit.ly, t.co,
+etc.) are now resolved to their destination before rules are evaluated,
+so a rule for <code>youtube.com</code> will match a shortened YouTube
+link too</li>
+<li><strong>Selection Panel Power-User Features</strong>:
+<ul>
+<li>Full keyboard navigation with wrap-around</li>
+<li>Cmd+C copies the URL straight from the panel</li>
+<li>Cmd+click on a browser to instantly create a rule for that
+domain</li>
+<li>Option+click for private mode (see above)</li>
+</ul></li>
+<li><strong>Usage-Based Browser Sorting</strong>: Optional setting that
+sorts browsers in the picker and panel by how often you actually use
+them, instead of alphabetically</li>
+<li><strong>Share Extension &amp; macOS Services</strong>: Send links to
+Proxly from any app via the Share menu or the system Services menu -
+Proxly will route them through your rules just like a normal link</li>
+<li><strong>AI Rule Generation in All 7 Languages</strong>: The AI rule
+generator now works in English, German, Spanish, French, Italian, Dutch,
+and Polish, with multilingual post-processing
+<ul>
+<li>Natural-language phrases like “everything except work hours” are now
+also extracted as exclusion patterns</li>
+</ul></li>
+<li><strong>JavaScript Transformations Upgraded</strong>: For users
+authoring custom JS transformations:
+<ul>
+<li><code>console.log</code> / <code>console.warn</code> /
+<code>console.error</code> for debugging directly in the JS editor</li>
+<li>Mutable URL properties - modify <code>href</code>,
+<code>pathname</code>, <code>host</code>, <code>search</code> directly
+without rebuilding the URL string</li>
+<li>SearchParams API for read/write query parameter manipulation</li>
+<li>Source-app and search-provider context injected as input, so
+transformations can behave differently for links coming from Slack
+vs. Mail, or from Google vs. DuckDuckGo</li>
+<li>Updated in-app help with examples for all new APIs</li>
+</ul></li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li><strong>UI Polish</strong>: Hover feedback and spring animations on
+interactive elements, plus subtle micro-interactions, staggered reveals,
+and a touch of celebration on key moments to make the app feel more
+alive</li>
+<li><strong>Selection Panel Layout</strong>: Modifier-key behavior
+reworked for consistency; the layout no longer shifts when modifiers are
+held</li>
+<li><strong>Rule Deduplication</strong>: Importing rules that share a
+domain but target different scheme types (e.g. <code>http</code> vs
+<code>mailto</code>) no longer flags them as duplicates</li>
+<li><strong>Tooltips</strong>: Comprehensive localized tooltips added
+across the entire UI in all 7 supported languages</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li><strong>Short URL Rules</strong>: Rule actions now apply to the
+<em>resolved</em> destination of a short link, not the shortener
+domain</li>
+<li><strong>Wrong Browser Profile</strong>: Chromium profile detection
+now uses the on-disk directory name instead of the display name,
+eliminating cases where the wrong profile would open after a profile
+rename</li>
+<li><strong>Profile Cache on Cold Launch</strong>: Profile data is
+warmed at startup, so the first link of the day always routes to the
+correct profile instead of falling back to the default</li>
+<li><strong>Safari Profile Selection</strong>: Confirming a Safari
+profile in the rule editor now correctly persists the choice</li>
+<li><strong>Corrupted Usage Cache</strong>: A corrupted browser-usage
+cache no longer prevents the panel from showing - Proxly clears the bad
+data and continues</li>
+<li><strong>Menu Bar Responsiveness</strong>: Reduced redundant
+accessibility work on the menu bar status item for snappier
+interaction</li>
+</ul>
+<h3 id="security">Security</h3>
+<ul>
+<li><strong>Licensing System Hardened</strong> <em>(Standalone
+build)</em>: Major upgrade to license verification - encrypted local
+storage of license data, atomic activation to prevent drift on flaky
+networks, signed server responses, and tougher certificate pinning that
+survives upstream cert rotations without breaking the app. License
+errors are now also more informative when something goes wrong.</li>
 </ul>]]></description>
-      <pubDate>Mon, 09 Mar 2026 13:06:10 +0100</pubDate>
-      <sparkle:version>224</sparkle:version>
-      <sparkle:shortVersionString>1.6.2</sparkle:shortVersionString>
+      <pubDate>Mon, 18 May 2026 02:28:49 +0200</pubDate>
+      <sparkle:version>240</sparkle:version>
+      <sparkle:shortVersionString>1.7.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>14.6</sparkle:minimumSystemVersion>
       <enclosure
-        url="https://github.com/pawel-mazurkiewicz/proxly-releases/releases/download/v1.6.2/Proxly.dmg"
+        url="https://github.com/pawel-mazurkiewicz/proxly-releases/releases/download/v1.7.0/Proxly.dmg"
         type="application/x-apple-diskimage"
-        sparkle:edSignature="JyroJthjslyWc4ZgoScw+awkw99j6ipj9VT0hD2LlEFe9i2ZK9rcbrUitVXCZdhABePUiAKkXzaij8dQGku6AA==" length="12316543" />
+        sparkle:edSignature="n652oI7rg7tMPHgWPR07Xkvw4iOseeG/OBy4wFGEF6pkOVlyHFD9Q+NfCT66qi0Ggt1IIqZDsFyLpREoLT08AA==" length="13322621" />
     </item>
   </channel>
 </rss>
